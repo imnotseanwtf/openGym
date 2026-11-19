@@ -19,6 +19,7 @@
  */
 import { zipStore, readZip, looksLikeZip } from './zip.js'
 import { referencedFiles, normalizeMediaRef, workoutMediaOf, cleanUrl, MEDIA_MIMES } from './media-refs.js'
+import { mealMediaOf } from './meal-log.js'
 import { sniffKind } from './media-sniff.js'
 import { sha256Hex } from './sha256.js'
 import { mediaStore } from './media-store.js'
@@ -56,6 +57,14 @@ export function sanitizeCustomMedia(state) {
     // all, and the workout shows the first WORKOUT_MEDIA_MAX as it would anywhere else.
     const list = workoutMediaOf(w, Infinity)
     if (list.length) w.media = list; else delete w.media
+  }
+  // A meal's photos: stills only, the same checks, at most MEAL_MEDIA_MAX of them.
+  if (state?.mealLog && typeof state.mealLog === 'object' && !Array.isArray(state.mealLog)) {
+    for (const meal of Object.values(state.mealLog)) {
+      if (!meal || typeof meal !== 'object' || !('media' in meal)) continue
+      const list = mealMediaOf(meal)
+      if (list.length) meal.media = list; else delete meal.media
+    }
   }
   return state
 }

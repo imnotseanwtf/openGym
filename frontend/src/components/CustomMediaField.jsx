@@ -62,7 +62,7 @@ const KIND_ICON = { image: 'image', gif: 'play', video: 'play' }
  * browser that cannot store them), `showAdd` false only where the button should not even show,
  * `storable` false where this browser cannot keep a file at all.
  */
-export function useMediaPicker() {
+export function useMediaPicker({ compact = false } = {}) {
   const user = useStore(s => s.user)
   const config = useStore(s => s.config)
   const [busy, setBusy] = useState(false)
@@ -90,8 +90,10 @@ export function useMediaPicker() {
     try {
       // The ingest (decoders, canvas, the MP4 walk) only loads when someone picks a file.
       // Offline before that code was ever cached, the load fails: that is no fault of the file.
-      const { ingestMediaFile } = await loadIngest()
-      const out = await ingestMediaFile(file, limitsFrom(config))
+      const ingest = await loadIngest()
+      // compact: a still only, encoded smaller (a meal's photo: lib/media-ingest.js compactEncoder).
+      const out = await ingest.ingestMediaFile(file, limitsFrom(config), compact ? { encodeImage: ingest.compactEncoder() } : undefined)
+      if (compact && out.media.kind !== 'image') throw Object.assign(new Error('not a still'), { code: 'type' })
       for (const b of out.blobs) await mediaStore.put(b.hash, b.blob, { mime: b.mime, pending: true })
       // A guest's or a local phone's copy is the only one: ask the browser not to evict it under
       // storage pressure. Best effort, and absent on plain http.

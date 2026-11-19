@@ -78,8 +78,10 @@ const CHECK_MIN_MS = 3000    // rev checks closer together than this are the sam
 const POLL_MS = 30000        // while the app is open and signed in, ask the server for its revision this often
 const AUTO_BACKUP_SOON_MS = 2000   // several photos picked at once make one backup
 // Whether `next` has a workout photo or video that `prev` had on none of its workouts.
-const workoutMediaHashes = S => (Array.isArray(S?.workouts) ? S.workouts : [])
-  .flatMap(w => (Array.isArray(w?.media) ? w.media.map(m => m?.hash).filter(h => typeof h === 'string' && h) : []))
+const workoutMediaHashes = S => [
+  ...(Array.isArray(S?.workouts) ? S.workouts : []),
+  ...(S?.mealLog && typeof S.mealLog === 'object' ? Object.values(S.mealLog) : [])   // a meal's photo counts the same
+].flatMap(w => (Array.isArray(w?.media) ? w.media.map(m => m?.hash).filter(h => typeof h === 'string' && h) : []))
 const gainedWorkoutMedia = (prev, next) => {
   const had = new Set(workoutMediaHashes(prev))
   return workoutMediaHashes(next).some(h => !had.has(h))
@@ -91,6 +93,8 @@ export const DEF = {
   // A note per day off (#261): { [iso]: { tag, text, _ts } } (lib/day-notes.js). A noted day is
   // excused from the missed-day nudge; each day merges on its own stamp (lib/sync-merge.js).
   dayNotes: {},
+  // The meal log (lib/meal-log.js): { [id]: { d, tm, name?, note?, kcal?, media?, _ts } }; a photo alone is a meal.
+  mealLog: {},
   // Body measurements (#82): one check-in per day, values in cm whatever the weight unit
   // (lib/measurements.js); merged across devices like weigh-ins (lib/sync-merge.js).
   measurements: [], measurementEnabled: null, customMeasurements: [],

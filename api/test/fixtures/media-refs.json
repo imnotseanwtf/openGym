@@ -869,6 +869,21 @@
         "workouts": []
       },
       "expect": []
+    },
+    {
+      "name": "a meal's photo and its poster count; a cleared meal, a non-object and a bad media list do not",
+      "state": {
+        "mealLog": {
+          "m1": { "d": "2026-11-19", "media": [ { "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "poster": { "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" } } ] },
+          "m2": { "_ts": 5 },
+          "m3": 7,
+          "m4": { "media": "x" }
+        }
+      },
+      "expect": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ]
     }
   ]
 }

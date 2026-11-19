@@ -15,6 +15,7 @@ import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { dayNoteOf } from '../lib/day-notes.js'
+import { MealsCard } from './Meals.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -186,6 +187,8 @@ export default function Home() {
         <div style={{ height: 8 }} /><Button onClick={() => nav('/plan')}>{t('Build my own plan')}</Button>
       </div>
     )}
+
+    <MealsCard />
 
     {S.showWeightCard !== false && <div className="card">
       <div className="row between bw-head" style={{ marginBottom: 6 }}>

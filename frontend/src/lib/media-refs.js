@@ -129,6 +129,11 @@ export function stateMediaRefs(state) {
     if (!isObj(w) || !Array.isArray(w.media)) continue
     for (const m of w.media) if (isObj(m)) out.push(m)
   }
+  // The photos of the meal log (lib/meal-log.js): a map of meals, each with a `media` list.
+  for (const meal of isObj(state.mealLog) ? Object.values(state.mealLog) : []) {
+    if (!isObj(meal) || !Array.isArray(meal.media)) continue
+    for (const m of meal.media) if (isObj(m)) out.push(m)
+  }
   return out
 }
 

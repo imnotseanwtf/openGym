@@ -36,7 +36,7 @@
  *     is the exception: the edit may have taken away the set the kept weight came from, so it
  *     is the best of the merged history and of the editing copy's own, and the other copy's
  *     can no longer bring a corrected typo back. exNotes, barWeights: key union
- *   - balanceOverrides, loadKind, plates, dbLoad, dumbbells, dayNotes: key union; of a key both
+ *   - balanceOverrides, loadKind, plates, dbLoad, dumbbells, dayNotes, mealLog: key union; of a key both
  *     have, the entry set last by its own `_ts`, a clear included (mergeStampedMap), the newer
  *     copy's on a tie. For plates and dumbbells the key is the unit, so the inventory of one unit
  *     is kept whole, as last edited; for dayNotes the key is the date, so each day's note is its own
@@ -82,8 +82,9 @@ import { readDayNote as readNote } from './day-notes.js'
 const clone = o => JSON.parse(JSON.stringify(o))
 const list = v => (Array.isArray(v) ? v : [])
 // The maps whose every entry carries its own edit time (mergeStampedMap). dayNotes is a day's
-// note on a day off (lib/day-notes.js), one entry per date.
-export const STAMPED_MAPS = ['balanceOverrides', 'loadKind', 'plates', 'dbLoad', 'dumbbells', 'dayNotes']
+// note on a day off (lib/day-notes.js), one entry per date; mealLog is one entry per meal
+// (lib/meal-log.js).
+export const STAMPED_MAPS = ['balanceOverrides', 'loadKind', 'plates', 'dbLoad', 'dumbbells', 'dayNotes', 'mealLog']
 
 /** The copy with the later `_ts`; on a tie the first argument (callers pass local first). */
 export const newerOf = (a, b) => ((b?._ts || 0) > (a?._ts || 0) ? b : a)

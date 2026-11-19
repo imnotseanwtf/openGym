@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Meal log.** A new Meals screen (a card on Home): tap *Snap a meal* and the photo is saved on its own,
+  with no details, to be filled in or analysed later. Photos are re-encoded on your device as WebP
+  (JPEG where the browser cannot write WebP) at most 1280 px wide and kept small, a few dozen KB
+  each, and they sync, back up and clean up like workout photos. Name, calories, time and notes are optional.
+- **Meal reminders.** Push reminders at times you choose (Settings → Reminders), sent by the server
+  even when the app is closed. Independent of the workout reminder.
+
 ## v1.4.1 (2026-10-10)
 
 Bug fixes for v1.4.0, mostly the things you told us about on Discord and GitHub.
