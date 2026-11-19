@@ -133,6 +133,9 @@ export const DEF = {
   // keeps the column it had. See effortOf.
   // nudge/tone: the missed-workout nudge (lib/nudge.js), opt-in, rides on the reminder.
   reminder: { on: false, time: '08:00', tz: null, nudge: false, tone: 'friendly' }, effort: null, autoBackup: false,
+  // Meal reminders: pushes at the times you pick, sent by the server (api/meal-reminders.js).
+  // Independent of the workout reminder; needs the push subscription (Settings → Notifications).
+  meals: { on: false, tz: null, items: [{ time: '08:00', label: 'Breakfast' }, { time: '12:30', label: 'Lunch' }, { time: '19:00', label: 'Dinner' }] },
   // Equipment profiles (issue: filter Library/picker/routines by what you actually own —
   // e.g. "Home" vs "Gym" — building on the session-only equipment filter from issue #6).
   equipProfiles: [], activeEquipId: null, equipFilterOn: false,
@@ -1947,6 +1950,9 @@ export const useStore = create((set, get) => {
           const tz = localTZ()
           if (get().S.reminder?.on && get().S.reminder.tz !== tz) {
             get().update(s => { s.reminder = { ...s.reminder, tz } })
+          }
+          if (get().S.meals?.on && get().S.meals.tz !== tz) {
+            get().update(s => { s.meals = { ...s.meals, tz } })
           }
         }
         // Closed with the sign-in's question still open: asked again once the app is up (see the

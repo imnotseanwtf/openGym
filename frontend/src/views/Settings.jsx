@@ -1182,8 +1182,45 @@ function PushCard({ S, update, toast }) {
         <NudgeRows S={S} setReminder={patch => update(s => { s.reminder = { ...(s.reminder || DEF.reminder), ...patch, tz: localTZ() } })} />
       )}
     </Section>
+    {on && <MealRemindersCard S={S} update={update} />}
     {on && <div style={{ marginTop: -12, marginBottom: 22 }}><Button size="sm" icon="bell" onClick={test}>{t('Send test notification')}</Button></div>}
   </>
+}
+
+// Meal reminders: pushes at the times you pick, sent by the server whether or not the app is open.
+// Shown only once push is on (PushCard); the phone build has no server push, so it is not offered.
+function MealRemindersCard({ S, update }) {
+  const base = DEF.meals || { on: false, items: [] }
+  const m = S.meals || base
+  const setMeals = fn => update(s => {
+    const next = { ...(s.meals || base), items: [...(s.meals?.items || base.items)] }
+    fn(next)
+    s.meals = { ...next, tz: localTZ() }
+  })
+  return (
+    <Section title={t('Meal reminders')}
+      footer={m.on ? t('A push at each time, every day, asking you to log your meal.') : null}>
+      <Row icon="bell" iconTint="var(--green)" title={t('Meal reminders')}>
+        <Switch checked={!!m.on} onChange={() => setMeals(n => { n.on = !m.on })} />
+      </Row>
+      {m.on && m.items.map((it, i) => (
+        <Row key={i} icon="clock" iconTint="var(--purple)" title={
+          <input className="timef" style={{ width: 130 }} value={it.label || ''} maxLength={40}
+            placeholder={t('Label')}
+            onChange={e => setMeals(n => { n.items[i] = { ...it, label: e.target.value } })} />
+        }>
+          <input type="time" className="timef" value={it.time}
+            onChange={e => e.target.value && setMeals(n => { n.items[i] = { ...it, time: e.target.value } })} />
+          <button type="button" className="timef" aria-label={t('Remove')}
+            onClick={() => setMeals(n => { n.items.splice(i, 1) })}>✕</button>
+        </Row>
+      ))}
+      {m.on && m.items.length < 12 && (
+        <Row icon="plus" iconTint="var(--blue)" title={t('Add a meal time')}
+          onClick={() => setMeals(n => { n.items.push({ time: '15:00', label: '' }) })} />
+      )}
+    </Section>
+  )
 }
 
 // Equipment profiles ("Home", "Gym", ...) — each an id/name/eq-list; the active one filters

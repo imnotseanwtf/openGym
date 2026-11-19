@@ -9,6 +9,8 @@ const COPY = {
     dayFallbackTitle: 'Workout planned today',
     dayRoutineSuffix: 'today',
     dayBody: "It's on your plan. Let's go 💪",
+    mealTitle: 'Meal time 🍽️',
+    mealBody: 'Log what you ate in openGym.',
   },
   'pt-BR': {
     restTitle: 'Descanso terminado 💪',
@@ -17,6 +19,8 @@ const COPY = {
     dayFallbackTitle: 'Treino planejado para hoje',
     dayRoutineSuffix: 'hoje',
     dayBody: 'Está no seu plano. Bora treinar 💪',
+    mealTitle: 'Hora da refeição 🍽️',
+    mealBody: 'Registre o que você comeu no openGym.',
   },
 };
 
@@ -40,6 +44,13 @@ export function dayReminderPush(lang, routine) {
     body: copy.dayBody,
     tag: 'day-reminder',
   };
+}
+
+// A meal reminder. The user's own label ("Lunch", "Post-workout shake") is the title when set.
+export function mealReminderPush(lang, label) {
+  const copy = copyFor(lang);
+  const name = typeof label === 'string' ? label.trim().slice(0, 40) : '';
+  return { title: name ? `🍽️ ${name}` : copy.mealTitle, body: copy.mealBody, tag: 'meal-reminder' };
 }
 
 // The missed-workout nudge (nudge.js). Its copy is translated in the frontend packs and generated

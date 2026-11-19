@@ -18,7 +18,8 @@ import * as coachJobs from './coach/jobs.js';
 import { coachRoutes } from './coach/routes.js';
 import { startCadence } from './coach/cadence.js';
 import { startWarmup } from './coach/warmup.js';
-import { dayReminderPush, nudgePush, restTimerPush, testPush } from './push-messages.js';
+import { dayReminderPush, mealReminderPush, nudgePush, restTimerPush, testPush } from './push-messages.js';
+import { dueMeals, mealKey } from './meal-reminders.js';
 import { verifyError } from './verify-error.js';
 import {
   hashPassword, verifyPassword, needsRehash, passwordProblem, passwordLength, nameKey, BusyError,
@@ -497,6 +498,23 @@ function nudgeTick(user, S, now) {
   saveDb();
   sendPush(user.id, nudgePush(S.lang, toneOf(S.reminder), routine, now.date));
 }
+// Meal reminders (meal-reminders.js): their own switch and times (S.meals), not tied to the
+// workout reminder. Each item goes out once per local date; `user.mealSent` remembers which.
+function mealTick(user, S) {
+  if (!S?.meals?.on) return;
+  const now = userNow(S.meals.tz || S.reminder?.tz || 'UTC');
+  if (!now) return;
+  const due = dueMeals(S.meals, now, user.mealSent);
+  if (!due.length) return;
+  const keys = user.mealSent?.date === now.date ? [...user.mealSent.keys] : [];
+  for (const it of due) keys.push(mealKey(it));
+  user.mealSent = { date: now.date, keys };
+  saveDb();
+  for (const it of due) {
+    console.log('meal reminder firing', user.id, it.time);
+    sendPush(user.id, mealReminderPush(S.lang, it.label));
+  }
+}
 setInterval(() => {
   for (const user of db.users) {
     if (!db.subs.some(s => s.userId === user.id)) continue;
@@ -505,6 +523,7 @@ setInterval(() => {
     // PUT /api/data refuses the obvious shapes, but a file already on disk answers to nobody.
     try {
       const S = readStateCached(user.id);
+      mealTick(user, S);
       if (!S?.reminder?.on) continue;
       const now = userNow(S.reminder.tz || 'UTC');
       if (!now) continue;
